@@ -21,18 +21,15 @@ class ExplicitAdams final : private ExplicitBase<Dimensions> {
 
   void compute_next_point() override {
     compute_f_diffs();
-    auto y_new =
-        y_n + delta * ((55 / 24) * f_diffs[0] - (59 / 24) * f_diffs[1] +
-                       (37 / 24) * f_diffs[2] - (9 / 24) * f_diffs[3]);
-    std::cout << &f_diffs << std::endl;
-    std::cout << &y_new << std::endl;
-    y_n = y_new;
+    y_n += delta * ((55 / 24) * f_diffs[0] - (59 / 24) * f_diffs[1] +
+                    (37 / 24) * f_diffs[2] - (9 / 24) * f_diffs[3]);
+    t_n += delta;
   }
 
 public:
   [[nodiscard]] std::vector<Vec> compute(const size_t n) override {
 
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n - 4; ++i) {
       compute_next_point();
       solution.push_back(y_n);
     }
@@ -48,11 +45,15 @@ public:
     ExplicitRGKutta<Dimensions> rgkutta_solver(delta, y0, system);
 
     auto sol = rgkutta_solver.compute(4);
-    auto f_diffs_start = rgkutta_solver.get_f_diffs();
+    f_diffs = rgkutta_solver.get_f_diffs();
+
+    for (auto &&x : sol) {
+      std::cout << x << std::endl;
+    }
 
     y_n = sol.back();
 
-    double t_n = delta * 4;
+    t_n = delta * 4;
   }
 
   ~ExplicitAdams<Dimensions>() override = default;

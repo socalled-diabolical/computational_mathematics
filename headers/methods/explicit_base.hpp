@@ -9,7 +9,7 @@ template <int Dimensions> class ExplicitBase {
 public:
   using Vec = Eigen::Vector<double, Dimensions>;
   using System = std::function<Vec(const double, Vec)>;
-
+  Vec y_n;
   double delta = 0;
   std::deque<Vec> f_diffs;
 
@@ -17,7 +17,6 @@ public:
   std::vector<Vec> solution;
 
   double t_n;
-  Vec y_n;
   Vec _y0;
 
   virtual void compute_next_point() = 0;
@@ -27,7 +26,7 @@ public:
   explicit ExplicitBase<Dimensions>(
       const double delta, const Vec y0,
       const std::function<Vec(const double, const Vec)> &system)
-      : delta{delta}, y_n{y0}, _y0{y0}, system{system} {}
+      : y_n{y0}, delta{delta}, _y0{y0}, system{system} {}
 
   virtual ~ExplicitBase<Dimensions>() {}
 };
